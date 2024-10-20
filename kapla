@@ -1,0 +1,70 @@
+import streamlit as st
+
+# Classe représentant un participant
+class Participant:
+   def __init__(self, name):
+       self.name = name
+       self.self_goal = 0  # Objectif fixé par le participant pour lui-même
+       self.self_result = 0  # Réalisation du participant
+       self.neighbor_goal = 0  # Objectif fixé pour le voisin
+       self.neighbor_result = 0  # Résultat du défi fixé par le voisin
+
+   def set_self_goal(self):
+       self.self_goal = st.number_input(f"{self.name}, combien de Kapla pensez-vous empiler en 1 minute ?", min_value=0)
+
+   def perform_self_challenge(self):
+       self.self_result = st.number_input(f"{self.name}, combien de Kapla avez-vous réellement empilé ?", min_value=0)
+
+   def analyze_self_performance(self):
+       difference = self.self_result - self.self_goal
+       if difference == 0:
+           st.write(f"{self.name} a atteint exactement son objectif.")
+       elif difference > 0:
+           st.write(f"{self.name} a dépassé son objectif de {difference} Kapla.")
+       else:
+           st.write(f"{self.name} a manqué son objectif de {-difference} Kapla.")
+
+   def set_neighbor_goal(self, neighbor_name):
+       self.neighbor_goal = st.number_input(f"{self.name}, combien de Kapla pensez-vous que {neighbor_name} peut empiler en 1 minute ?", min_value=0)
+
+   def perform_neighbor_challenge(self):
+       self.neighbor_result = st.number_input(f"{self.name}, combien de Kapla avez-vous empilé pour le défi fixé par votre voisin ?", min_value=0)
+
+   def analyze_neighbor_performance(self):
+       difference = self.neighbor_result - self.neighbor_goal
+       if difference == 0:
+           st.write(f"{self.name} a atteint exactement l'objectif fixé par son voisin.")
+       elif difference > 0:
+           st.write(f"{self.name} a dépassé l'objectif fixé par son voisin de {difference} Kapla.")
+       else:
+           st.write(f"{self.name} a manqué l'objectif fixé par son voisin de {-difference} Kapla.")
+
+def main():
+   st.title("Kapla Challenge")
+
+   num_participants = st.number_input("Combien de participants ?", min_value=1, max_value=10, step=1)
+
+   participants = [Participant(st.text_input(f"Nom du participant {i + 1}")) for i in range(num_participants)]
+
+   if st.button("Commencer le défi"):
+       st.write("--- Fixation des objectifs personnels ---")
+       for participant in participants:
+           participant.set_self_goal()
+
+       st.write("--- Réalisation des défis personnels ---")
+       for participant in participants:
+           participant.perform_self_challenge()
+           participant.analyze_self_performance()
+
+       st.write("--- Fixation des objectifs pour le voisin ---")
+       for i, participant in enumerate(participants):
+           neighbor = participants[i - 1] if i > 0 else participants[-1]
+           participant.set_neighbor_goal(neighbor.name)
+
+       st.write("--- Réalisation des défis fixés par le voisin ---")
+       for participant in participants:
+           participant.perform_neighbor_challenge()
+           participant.analyze_neighbor_performance()
+
+if __name__ == "__main__":
+   main()
